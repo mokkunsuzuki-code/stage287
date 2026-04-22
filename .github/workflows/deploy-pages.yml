@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -24,18 +24,26 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Build decision
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Build Stage285 decision
         run: |
-          python3 tools/build_stage284_decision.py
+          python3 tools/build_stage285_decision.py
 
       - name: Prepare site
         run: |
-          mkdir -p _site
-          cp index.html _site/index.html
+          rm -rf _site
           mkdir -p _site/out/decision
+          cp index.html _site/index.html
           cp out/decision/decision.json _site/out/decision/decision.json
+          if [ -f out/decision/payload_result.json ]; then
+            cp out/decision/payload_result.json _site/out/decision/payload_result.json
+          fi
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
